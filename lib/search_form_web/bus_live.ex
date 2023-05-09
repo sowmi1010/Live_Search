@@ -5,12 +5,11 @@ defmodule SearchFormWeb.BusLive do
     ~L"""
     <div>
       <h2 class="font-sans font-bold text-center text-2xl text-purple-600">In the search box, enter the point of origin and destination</h2>
-      <form phx-submit="search" phx-change="search" phx-value-from="search_bus" class="mt-4 flex gap-2">
-      <input type="text" name="search_bus" autofocus autocomplete="off" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500" placeholder="FROM" />
-      <input type="text" name="search_bus" autofocus autocomplete="off" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500" placeholder="TO" />
-
-      <button type="submit" class="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 sm:w-auto">Submit</button>
-    </form>
+      <form phx-submit="search" phx-change="search" phx-value-from="search_bus"  class="mt-4 flex gap-2">
+        <input type="text" name="search_bus"  autofocus autocomplete="off" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500" placeholder="FROM" />
+        <input type="text" name="search_bus" autofocus autocomplete="off" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500" placeholder="TO" />
+        <button type="submit" class="w-full rounded-lg bg-blue-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 sm:w-auto">Submit</button>
+     </form>
 
       <div class="grid grid-cols-3 gap-7 mt-4">
         <%= for bus <- @buses do %>
@@ -49,7 +48,10 @@ defmodule SearchFormWeb.BusLive do
 
   def filtered_buses(search_bus) do
     getBuses()
-    |> Enum.filter(fn bus -> bus.from == search_bus || bus.to == search_bus end)
+    |> Enum.filter(fn bus ->
+      String.downcase(bus.from) == String.downcase(search_bus) ||
+        String.downcase(bus.to) == String.downcase(search_bus)
+    end)
   end
 
   def handle_event("search", %{"search_bus" => search_bus}, socket) do
