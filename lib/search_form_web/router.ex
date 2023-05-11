@@ -19,7 +19,7 @@ defmodule SearchFormWeb.Router do
 
     get("/", PageController, :home)
 
-    live("/search", BusLive)
+    live "/bus", SearchBusLive
   end
 
   # Other scopes may use custom stacks.
