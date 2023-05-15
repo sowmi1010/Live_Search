@@ -1,8 +1,10 @@
 defmodule SearchFormWeb.SearchBusLive do
   use SearchFormWeb, :live_view
 
+  alias SearchForm.ListBus
+
   def render(assigns) do
-    ~H"""
+    ~L"""
     <div class="flex-grow relative overflow-hidden rounded-lg shadow-lg cursor-pointer">
       <img
         class="object-cover w-full h-80"
@@ -14,7 +16,8 @@ defmodule SearchFormWeb.SearchBusLive do
           In the search box, enter the point of origin and destination
         </h1>
 
-        <form phx-submit="search" class="mt-4 flex gap-2">
+        <form phx-submit="search" phx-change="auto_search"
+           class="mt-4 flex gap-2">
           <input
             type="text"
             name="from"
@@ -23,6 +26,7 @@ defmodule SearchFormWeb.SearchBusLive do
             phx-value="from"
             class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
             placeholder="FROM"
+            list="matches"
           />
           <input
             type="text"
@@ -32,6 +36,8 @@ defmodule SearchFormWeb.SearchBusLive do
             phx-value="to"
             class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
             placeholder="TO"
+            list="matches"
+
           />
           <button
             type="submit"
@@ -40,6 +46,12 @@ defmodule SearchFormWeb.SearchBusLive do
             Submit
           </button>
         </form>
+
+        <datalist id="matches">
+          <%= for {_, city} <- @matches do %>
+            <option value=<%= city %> />
+          <% end %>
+        </datalist>
       </div>
     </div>
 
@@ -70,7 +82,7 @@ defmodule SearchFormWeb.SearchBusLive do
   end
 
   def mount(_params, _session, socket) do
-    socket = assign(socket, from: "", to: "", buses: [])
+    socket = assign(socket, from: "", to: "", buses: [], matches: %{})
     {:ok, socket}
   end
 
@@ -88,6 +100,11 @@ defmodule SearchFormWeb.SearchBusLive do
     buses = filtered_bus(from, to)
     socket = assign(socket, from: from, to: to, buses: buses)
     {:noreply, socket}
+  end
+
+  def handle_event("auto_search", %{"from" => from}, socket) do
+    matches = SearchForm.ListBus.auto_search(from)
+    {:noreply, assign(socket, matches: matches)}
   end
 
   defp getBuses do
